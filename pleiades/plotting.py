@@ -13,10 +13,10 @@ def plot_experiment(experiment, path):
     training_loss_values = experiment.training_losses
     test_loss_values = experiment.test_losses
     times = experiment.times
-    niter = experiment.niter
+    epochs = experiment.epochs
     n_plot = experiment.n_plot
-    freq = max([round(niter / n_plot), 1])
-    iter_count = np.arange(0, niter + n_plot, freq)[0 : len(training_loss_values)]
+    freq = max([round(epochs / n_plot), 1])
+    epoch_count = np.arange(0, epochs + freq, freq)[0 : len(training_loss_values)]
 
     nrows = 2
     ncols = 2
@@ -24,9 +24,9 @@ def plot_experiment(experiment, path):
 
     plot_lineplot(
         axis=ax[0, 0],
-        xdata=iter_count,
+        xdata=epoch_count,
         ydata=training_loss_values,
-        xlabel="Iterations",
+        xlabel="Epochs",
         ylabel="Training Loss",
     )
 
@@ -40,9 +40,9 @@ def plot_experiment(experiment, path):
 
     plot_lineplot(
         axis=ax[0, 1],
-        xdata=iter_count,
+        xdata=epoch_count,
         ydata=test_loss_values,
-        xlabel="Iterations",
+        xlabel="Epochs",
         ylabel="Test Loss",
     )
 

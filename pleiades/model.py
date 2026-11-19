@@ -81,17 +81,6 @@ class CausalSelfAttention(nn.Module):
         self.W_q = nn.Linear(embed_dim, head_dim * n_head, bias=False)
         self.W_k = nn.Linear(embed_dim, head_dim * n_head, bias=False)
         self.W_v = nn.Linear(embed_dim, head_dim * n_head, bias=False)
-    
-    # this can be done more efficiently with F.scaled_dot_product_attention(q, k, v, is_causal=True)
-    # but it doesn't support forward AD yet
-    def scaled_dot_product_attention(self, query, key, value):
-        T = query.size(-2)
-        attn_bias = torch.zeros(T, T, dtype=query.dtype, device=query.device)
-        temp_mask = torch.ones(T, T, dtype=torch.bool, device=query.device).tril(diagonal=0)
-        attn_bias.masked_fill_(temp_mask.logical_not(), float("-inf"))
-        attn_weight = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(query.size(-1)) + attn_bias
-        attn_weight = torch.softmax(attn_weight, dim=-1)
-        return torch.matmul(attn_weight, value)
 
     def forward(self, x):
         B, T, _ = x.size() # batch size, sequence length, embed_dim
@@ -100,13 +89,13 @@ class CausalSelfAttention(nn.Module):
         q = self.W_q(x)
         k = self.W_k(x)
         v = self.W_v(x)
-        # for scaled_dot_product_attention we need the second to last
+        # For scaled_dot_product_attention we need the second to last
         # axis to index position within a sequence, and the last axis
         # to index elements of a head's embedding.
         q = q.view(B, T, n_head, head_dim).transpose(1, 2)
         k = k.view(B, T, n_head, head_dim).transpose(1, 2)
         v = v.view(B, T, n_head, head_dim).transpose(1, 2)
-        x = self.scaled_dot_product_attention(q, k, v)
+        x = F.scaled_dot_product_attention(q, k, v, is_causal=True)
         # x is B x n_head x T x head_dim. We want it to be B x T x head_dim * n_head.
         x = x.transpose(1, 2).contiguous().view(B, T, -1)
         return x

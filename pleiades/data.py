@@ -4,13 +4,13 @@ tokenize it, and split it into training and test data sets.
 """
 
 from dataclasses import dataclass
-from datasets import load_dataset
 from itertools import count
+
+from datasets import load_dataset
 from nltk.tokenize import wordpunct_tokenize
 import numpy as np
 import torch
 from torch.utils.data import Dataset
-from utils import CustomTextDataset
 
 @dataclass
 class Data:
