@@ -34,13 +34,13 @@ else:
 seq_length = 100
 n_layer = 3
 n_head = 3
-embed_dim = 30
-head_dim = 10
-mlp_dim = 120
-n = 100
-batch_size = 10
-epochs = 100
-step_size = .01 # should scale with batch_size
+embed_dim = 300
+head_dim = 100
+mlp_dim = 1200
+n = 10000
+batch_size = 100
+epochs = 100 # 5
+step_size = .001 # should scale with batch_size
 n_plot = 100 # number of points where full loss is computed
 plot_only = False  # change to True if you want to plot existing experimental results
 
